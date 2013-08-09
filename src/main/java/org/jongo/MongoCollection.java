@@ -18,6 +18,7 @@ package org.jongo;
 
 import com.mongodb.*;
 import org.bson.types.ObjectId;
+import org.jongo.query.DBQuery;
 import org.jongo.query.Query;
 
 
@@ -72,6 +73,10 @@ public class MongoCollection {
         return new FindOne(collection, readPreference, mapper.getUnmarshaller(), mapper.getQueryFactory(), query, parameters);
     }
 
+    public FindOne findOne(Query query) {
+        return new FindOne(collection, readPreference, mapper.getUnmarshaller(), mapper.getQueryFactory(), query);
+    }
+
     public Find find() {
         return find(ALL);
     }
@@ -82,6 +87,10 @@ public class MongoCollection {
 
     public Find find(String query, Object... parameters) {
         return new Find(collection, readPreference, mapper.getUnmarshaller(), mapper.getQueryFactory(), query, parameters);
+    }
+
+    public Find find(Query query) {
+        return new Find(collection, readPreference, mapper.getUnmarshaller(), mapper.getQueryFactory(), query);
     }
 
     public FindAndModify findAndModify() {
@@ -109,6 +118,10 @@ public class MongoCollection {
         return collection.getCount(dbQuery, null, readPreference);
     }
 
+    public long count(Query query) {
+        return collection.getCount(query.toDBObject(), null, readPreference);
+    }
+
     public Update update(String query) {
         return update(query, NO_PARAMETERS);
     }
@@ -123,6 +136,11 @@ public class MongoCollection {
     public Update update(String query, Object... parameters) {
         return new Update(collection, writeConcern, mapper.getQueryFactory(), query, parameters);
     }
+
+    public Update update(Query query) {
+        return new Update(collection, writeConcern, mapper.getQueryFactory(), query);
+    }
+
 
     public WriteResult save(Object pojo) {
         return new Insert(collection, writeConcern, mapper.getMarshaller(), mapper.getObjectIdUpdater(), mapper.getQueryFactory()).save(pojo);
@@ -160,6 +178,10 @@ public class MongoCollection {
         return collection.remove(createQuery(query, parameters).toDBObject(), writeConcern);
     }
 
+    public WriteResult remove(Query query) {
+        return collection.remove(query.toDBObject(), writeConcern);
+    }
+
     public Distinct distinct(String key) {
         return new Distinct(collection, mapper.getUnmarshaller(), mapper.getQueryFactory(), key);
     }
@@ -170,6 +192,10 @@ public class MongoCollection {
 
     public Aggregate aggregate(String pipelineOperator, Object... parameters) {
         return new Aggregate(collection.getDB(), collection.getName(), mapper.getUnmarshaller(), mapper.getQueryFactory()).and(pipelineOperator, parameters);
+    }
+
+    public Aggregate aggregate(Query query) {
+        return new Aggregate(collection.getDB(), collection.getName(), mapper.getUnmarshaller(), mapper.getQueryFactory()).and(query);
     }
 
     public void drop() {
@@ -202,6 +228,10 @@ public class MongoCollection {
 
     private Query createQuery(String query, Object... parameters) {
         return mapper.getQueryFactory().createQuery(query, parameters);
+    }
+
+    private Query createQuery(DBObject dbQuery) {
+        return new DBQuery(dbQuery);
     }
 
     @Override

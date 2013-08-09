@@ -40,6 +40,13 @@ public class Update {
         this.query = createQuery(query, parameters);
     }
 
+    Update(DBCollection collection, WriteConcern writeConcern, QueryFactory queryFactory, Query query) {
+        this.collection = collection;
+        this.writeConcern = writeConcern;
+        this.queryFactory = queryFactory;
+        this.query = query;
+    }
+
     public WriteResult with(String modifier) {
         return with(modifier, new Object[0]);
     }

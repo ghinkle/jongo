@@ -21,6 +21,7 @@ import com.mongodb.CommandResult;
 import com.mongodb.DB;
 import com.mongodb.DBObject;
 import org.jongo.marshall.Unmarshaller;
+import org.jongo.query.Query;
 import org.jongo.query.QueryFactory;
 
 import java.util.ArrayList;
@@ -42,6 +43,11 @@ public class Aggregate {
         this.unmarshaller = unmarshaller;
         this.queryFactory = queryFactory;
         this.pipeline = new ArrayList<DBObject>();
+    }
+
+    public Aggregate and(Query query) {
+        pipeline.add(query.toDBObject());
+        return this;
     }
 
     public Aggregate and(String pipelineOperator, Object... parameters) {

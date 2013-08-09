@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Benoit GUEROUT <bguerout at gmail dot com> and Yves AMSELLEM <amsellem dot yves at gmail dot com>
+ * Copyright (C) 2011 Greg Hinkle <greghinkle at gmail dot com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,34 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.jongo.query;
 
 import com.mongodb.DBObject;
-import com.mongodb.util.JSON;
 
-public class JsonQuery implements Query {
+public class DBQuery implements Query {
 
-    private final DBObject dbo;
+    private DBObject query;
 
-    public JsonQuery(String query) {
-        this.dbo = marshallQuery(query);
-    }
-
-    private DBObject marshallQuery(String query) {
-        try {
-            return (DBObject) JSON.parse(query);
-        } catch (Exception e) {
-            throw new IllegalArgumentException(query + " cannot be parsed", e);
-        }
+    public DBQuery(DBObject query) {
+        this.query = query;
     }
 
     public DBObject toDBObject() {
-        return dbo;
-    }
-
-    @Override
-    public String toString() {
-        return dbo.toString();
+        return query;
     }
 }

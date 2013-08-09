@@ -36,6 +36,14 @@ public class Find {
     private Query fields, sort, hint;
     private Integer limit, skip;
 
+    Find(DBCollection collection, ReadPreference readPreference, Unmarshaller unmarshaller, QueryFactory queryFactory, Query query) {
+        this.readPreference = readPreference;
+        this.unmarshaller = unmarshaller;
+        this.collection = collection;
+        this.queryFactory = queryFactory;
+        this.query = query;
+    }
+
     Find(DBCollection collection, ReadPreference readPreference, Unmarshaller unmarshaller, QueryFactory queryFactory, String query, Object... parameters) {
         this.readPreference = readPreference;
         this.unmarshaller = unmarshaller;
@@ -67,6 +75,11 @@ public class Find {
         }
     }
 
+    public Find projection(Query fields) {
+        this.fields = fields;
+        return this;
+    }
+
     public Find projection(String fields) {
         this.fields = queryFactory.createQuery(fields);
         return this;
@@ -84,6 +97,11 @@ public class Find {
 
     public Find skip(int skip) {
         this.skip = skip;
+        return this;
+    }
+
+    public Find sort(Query sort) {
+        this.sort = sort;
         return this;
     }
 

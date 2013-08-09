@@ -42,6 +42,14 @@ public class FindOne {
         this.query = this.queryFactory.createQuery(query, parameters);
     }
 
+    FindOne(DBCollection collection, ReadPreference readPreference, Unmarshaller unmarshaller, QueryFactory queryFactory, Query query) {
+        this.unmarshaller = unmarshaller;
+        this.collection = collection;
+        this.readPreference = readPreference;
+        this.queryFactory = queryFactory;
+        this.query = query;
+    }
+
     public <T> T as(final Class<T> clazz) {
         return map(newMapper(clazz, unmarshaller));
     }
