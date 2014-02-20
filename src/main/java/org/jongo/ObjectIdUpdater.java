@@ -25,4 +25,7 @@ public interface ObjectIdUpdater {
     Object getId(Object pojo);
 
     void setObjectId(Object target, ObjectId id);
+
+    public boolean isOIDField(Object pojo);
+
 }

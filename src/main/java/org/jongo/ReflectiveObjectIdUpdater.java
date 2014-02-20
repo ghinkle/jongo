@@ -36,6 +36,11 @@ public class ReflectiveObjectIdUpdater implements ObjectIdUpdater {
         return idField != null && isAnEmptyObjectId(pojo, idField);
     }
 
+    public boolean isOIDField(Object pojo) {
+        Field idField = selectIdField(pojo.getClass());
+        return idField != null && idField.getType().isAssignableFrom(ObjectId.class);
+    }
+
     public Object getId(Object pojo) {
         Field idField = selectIdField(pojo.getClass());
         if (idField != null) {

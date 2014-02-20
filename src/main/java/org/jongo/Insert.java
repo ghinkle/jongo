@@ -44,27 +44,44 @@ class Insert {
         this.queryFactory = queryFactory;
     }
 
+
     public WriteResult save(Object pojo) {
-        Object id = preparePojo(pojo);
-        return collection.save(convertToDBObject(pojo, id), writeConcern);
+        DBObject dbObject = preparePojo(pojo);
+        return collection.save(dbObject, writeConcern);
     }
 
     public WriteResult insert(Object... pojos) {
         List<DBObject> dbos = new ArrayList<DBObject>(pojos.length);
         for (Object pojo : pojos) {
-            Object id = preparePojo(pojo);
-            dbos.add(convertToDBObject(pojo, id));
+            DBObject dbObject = preparePojo(pojo);
+            dbos.add(dbObject);
         }
         return collection.insert(dbos, writeConcern);
     }
 
-    private Object preparePojo(Object pojo) {
+    private DBObject preparePojo(Object pojo) {
+
         if (objectIdUpdater.mustGenerateObjectId(pojo)) {
             ObjectId newOid = ObjectId.get();
             objectIdUpdater.setObjectId(pojo, newOid);
-            return newOid;
+            BsonDocument document = marshallDocument(pojo);
+            DBObject dbo = new AlreadyCheckedDBObject(document.toByteArray(), newOid);
+            dbo.put("_id", newOid);
+            return dbo;
         }
-        return objectIdUpdater.getId(pojo);
+
+        Object id = objectIdUpdater.getId(pojo);
+        if (id instanceof ObjectId) {
+            BsonDocument document = marshallDocument(pojo);
+            DBObject dbo = new AlreadyCheckedDBObject(document.toByteArray(), id);
+            dbo.put("_id", id);
+            return dbo;
+        }
+
+
+        BsonDocument document = marshallDocument(pojo);
+        return new LazyWriteableDBObject(document.toByteArray(), new LazyBSONCallback());
+
     }
 
     public WriteResult insert(String query, Object... parameters) {
@@ -72,12 +89,6 @@ class Insert {
         return collection.insert(dbQuery, writeConcern);
     }
 
-    private DBObject convertToDBObject(Object pojo, Object id) {
-        BsonDocument document = marshallDocument(pojo);
-        DBObject dbo = new AlreadyCheckedDBObject(document.toByteArray(), id);
-        dbo.put("_id", id);
-        return dbo;
-    }
 
     private BsonDocument marshallDocument(Object pojo) {
         try {

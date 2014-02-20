@@ -124,6 +124,10 @@ public class JacksonMapperTest {
             public void setObjectId(Object newPojo, ObjectId id) {
             }
 
+            public boolean isOIDField(Object pojo) {
+                return true;
+            }
+
             public Object getId(Object pojo) {
                 return null;
             }
